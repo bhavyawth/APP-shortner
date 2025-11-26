@@ -1,0 +1,21 @@
+@import "tailwindcss";
+
+.meteor {
+  position: absolute;
+  width: 3px;
+  height: 80px;
+  background: linear-gradient(45deg, white, transparent);
+  opacity: 0.7;
+  transform: rotate(-45deg);
+  animation: fall 2s linear infinite;
+}
+
+@keyframes fall {
+  0% {
+    transform: translateX(0) translateY(0) rotate(-45deg);
+  }
+  100% {
+    transform: translateX(-300px) translateY(300px) rotate(-45deg);
+    opacity: 0;
+  }
+}
