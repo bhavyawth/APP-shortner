@@ -1,6 +1,6 @@
-import { useEffect, useState } from "react";
-import { getMyURLs } from "../api";
-import { getQRCode } from "../api";
+import React, { useEffect, useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { getMyURLs, getQRCode } from "../api";
 
 export default function URLTable() {
   const [rows, setRows] = useState([]);
@@ -8,147 +8,174 @@ export default function URLTable() {
   const [copiedCode, setCopiedCode] = useState(null);
 
   useEffect(() => {
-    getMyURLs("test_user_123").then(setRows);
+    refresh();
   }, []);
 
+  async function refresh() {
+    const data = await getMyURLs("test_user_123");
+    setRows(data || []);
+  }
+
+  const tableWrap = {
+    background: "linear-gradient(180deg, rgba(255,255,255,0.01), rgba(255,255,255,0.005))",
+    borderRadius: 12,
+    padding: 10,
+    border: "1px solid rgba(255,255,255,0.04)",
+    boxShadow: "0 8px 30px rgba(0,0,0,0.6)",
+    backdropFilter: "blur(6px)"
+  };
+
+  const thStyle = { textAlign: "left", padding: "10px 12px", color: "#bfe9ff", fontSize: 13 };
+  const tdStyle = { padding: "10px 12px", borderTop: "1px solid rgba(255,255,255,0.02)" };
+
   return (
-    <table style={{ width: "100%", borderCollapse: "collapse" }}>
-      <thead>
-        <tr style={{ background: "#e5e7eb" }}>
-          <th style={{ padding: "10px", border: "1px solid #ccc" }}>Short Code</th>
-          <th style={{ padding: "10px", border: "1px solid #ccc" }}>Long URL</th>
-          <th style={{ padding: "10px", border: "1px solid #ccc" }}>Clicks</th>
-          <th style={{ padding: "10px", border: "1px solid #ccc" }}>Scan For Magic</th>
-          <th style={{ padding: "10px", border: "1px solid #ccc" }}>Copy</th>
-        </tr>
-      </thead>
+    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} style={tableWrap}>
+      <h3 style={{ marginTop: 6, marginBottom: 8 }}>Your Links</h3>
 
-      <tbody>
-        {rows.length === 0 ? (
+      <table style={{ width: "100%", borderCollapse: "collapse" }}>
+        <thead>
           <tr>
-            <td colSpan="5" style={{ padding: "20px", textAlign: "center" }}>
-              No URLs created yet.
-            </td>
+            <th style={thStyle}>Short</th>
+            <th style={thStyle}>Destination</th>
+            <th style={thStyle}>Clicks</th>
+            <th style={thStyle}>Copy</th>
+            <th style={thStyle}>QR</th>
           </tr>
-        ) : (
-          rows.map((r, i) => (
-            <tr key={i}>
-              <td style={{ padding: "10px", border: "1px solid #ccc" }}>
-                <a href={`http://localhost:5000/${r.code}`} target="_blank">
-                  {r.code}
-                </a>
-              </td>
+        </thead>
 
-              <td style={{ padding: "10px", border: "1px solid #ccc" }}>
-                {r.long_url}
-              </td>
-
-              <td style={{ padding: "10px", border: "1px solid #ccc" }}>
-                {r.clicks}
-              </td>
-
-              {/* QR COLUMN */}
-              <td
-                style={{
-                  padding: "10px",
-                  border: "1px solid #ccc",
-                  textAlign: "center",
-                }}
+        <tbody>
+          <AnimatePresence>
+            {rows.length === 0 && (
+              <motion.tr
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
               >
-                <button
-                  onClick={async () => {
-                    const res = await getQRCode(r.code);
-                    setQrImage("data:image/png;base64," + res.qr);
-                  }}
-                  style={{
-                    padding: "6px 10px",
-                    background: "#3b82f6",
-                    color: "white",
-                    border: "none",
-                    borderRadius: "6px",
-                    cursor: "pointer",
-                  }}
-                >
-                  QR
-                </button>
-              </td>
+                <td colSpan="5" style={{ padding: 20, textAlign: "center", color: "#aee8ff" }}>
+                  No URLs yet — shorten one on the home page!
+                </td>
+              </motion.tr>
+            )}
 
-              {/* COPY COLUMN */}
-              <td
-                style={{
-                  padding: "10px",
-                  border: "1px solid #ccc",
-                  textAlign: "center",
-                }}
+            {rows.map((item, i) => (
+              <motion.tr
+                key={item.code}
+                initial={{ opacity: 0, y: 6 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: 6 }}
+                transition={{ duration: 0.25, delay: i * 0.03 }}
+                style={{ color: "#dbf7ff" }}
               >
-                <button
-                  onClick={() => {
-                    const fullURL = `http://localhost:5000/${r.code}`;
-                    navigator.clipboard.writeText(fullURL);
-                    setCopiedCode(r.code);
-                    setTimeout(() => setCopiedCode(null), 1500);
-                  }}
-                  style={{
-                    padding: "6px 10px",
-                    background: copiedCode === r.code ? "#10b981" : "#3b82f6",
-                    color: "white",
-                    border: "none",
-                    borderRadius: "6px",
-                    cursor: "pointer",
-                    transition: "0.25s",
-                  }}
-                >
-                  {copiedCode === r.code ? "Copied ✓" : "Copy"}
-                </button>
-              </td>
-            </tr>
-          ))
-        )}
-      </tbody>
+                <td style={tdStyle}>
+                  <a href={`http://localhost:5000/${item.code}`} target="_blank" rel="noreferrer" style={{ color: "#c7f1ff" }}>
+                    {item.code}
+                  </a>
+                </td>
+
+                <td style={tdStyle}>
+                  <div style={{ maxWidth: 520, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                    {item.long_url}
+                  </div>
+                </td>
+
+                <td style={tdStyle}>{item.clicks ?? 0}</td>
+
+                <td style={tdStyle}>
+                  <motion.button
+                    onClick={() => {
+                      const fullURL = `http://localhost:5000/${item.code}`;
+                      navigator.clipboard.writeText(fullURL);
+                      setCopiedCode(item.code);
+                      setTimeout(() => setCopiedCode(null), 1300);
+                    }}
+                    whileTap={{ scale: 0.98 }}
+                    style={{
+                      padding: "6px 10px",
+                      borderRadius: 8,
+                      border: "none",
+                      cursor: "pointer",
+                      background: copiedCode === item.code ? "#10b981" : "linear-gradient(135deg, #00c6ff, #0072ff)",
+                      color: "#051523",
+                      fontWeight: 700
+                    }}
+                  >
+                    {copiedCode === item.code ? "Copied ✓" : "Copy"}
+                  </motion.button>
+                </td>
+
+                <td style={tdStyle}>
+                  <motion.button
+                    onClick={async () => {
+                      const res = await getQRCode(item.code);
+                      setQrImage("data:image/png;base64," + res.qr);
+                    }}
+                    whileTap={{ scale: 0.98 }}
+                    style={{
+                      padding: "6px 10px",
+                      borderRadius: 8,
+                      border: "none",
+                      cursor: "pointer",
+                      background: "linear-gradient(135deg, #00c6ff, #0072ff)",
+                      color: "#051523",
+                      fontWeight: 700
+                    }}
+                  >
+                    QR
+                  </motion.button>
+                </td>
+              </motion.tr>
+            ))}
+          </AnimatePresence>
+        </tbody>
+      </table>
 
       {qrImage && (
-        <div
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
           style={{
             position: "fixed",
-            top: 0,
-            left: 0,
-            width: "100%",
-            height: "100%",
-            background: "rgba(0,0,0,0.5)",
+            inset: 0,
             display: "flex",
-            justifyContent: "center",
             alignItems: "center",
+            justifyContent: "center",
+            background: "rgba(0,0,0,0.55)",
+            zIndex: 60
           }}
           onClick={() => setQrImage(null)}
         >
-          <div
+          <motion.div
+            initial={{ scale: 0.9 }}
+            animate={{ scale: 1 }}
             style={{
-              background: "white",
-              padding: "20px",
-              borderRadius: "10px",
-              textAlign: "center",
+              background: "linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01))",
+              borderRadius: 12,
+              padding: 20,
+              border: "1px solid rgba(255,255,255,0.06)"
             }}
+            onClick={(e) => e.stopPropagation()}
           >
-            <img src={qrImage} alt="QR Code" width="200" />
-
+            <img src={qrImage} alt="qr" width={220} height={220} style={{ display: "block" }} />
             <a
               href={qrImage}
               download="qrcode.png"
               style={{
-                display: "block",
-                marginTop: "15px",
-                padding: "10px",
-                background: "#10b981",
-                color: "white",
-                borderRadius: "6px",
-                textDecoration: "none",
+                display: "inline-block",
+                marginTop: 12,
+                padding: "8px 12px",
+                borderRadius: 8,
+                background: "linear-gradient(90deg,#10b981,#34d399)",
+                color: "#021217",
+                fontWeight: 800,
+                textDecoration: "none"
               }}
             >
               Download QR
             </a>
-          </div>
-        </div>
+          </motion.div>
+        </motion.div>
       )}
-    </table>
+    </motion.div>
   );
 }
