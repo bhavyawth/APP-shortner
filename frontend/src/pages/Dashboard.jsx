@@ -3,7 +3,7 @@ import { motion } from "framer-motion";
 import StatsCard from "../components/StatsCard";
 import URLTable from "../components/URLTable";
 
-export default function Dashboard() {
+export default function Dashboard({getUser}) {
   return (
     <motion.div
       initial={{ opacity: 0, y: 8 }}
@@ -11,11 +11,11 @@ export default function Dashboard() {
       transition={{ duration: 0.45 }}
     >
       <div style={{ display: "flex", gap: 20, alignItems: "flex-start", marginBottom: 20 }}>
-        <StatsCard />
+        <StatsCard getUser={getUser}/>
         <div style={{ flex: 1 }} />
       </div>
 
-      <URLTable />
+      <URLTable getUser={getUser}/>
     </motion.div>
   );
 }

@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { getMyURLs, getQRCode } from "../api";
 
-export default function URLTable() {
+export default function URLTable({getUser}) {
   const [rows, setRows] = useState([]);
   const [qrImage, setQrImage] = useState(null);
   const [copiedCode, setCopiedCode] = useState(null);
@@ -12,7 +12,8 @@ export default function URLTable() {
   }, []);
 
   async function refresh() {
-    const data = await getMyURLs("test_user_123");
+    const user=getUser
+    const data = await getMyURLs(user);
     setRows(data || []);
   }
 

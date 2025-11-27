@@ -2,11 +2,12 @@ import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { getStats } from "../api";
 
-export default function StatsCard() {
+export default function StatsCard({getUser}) {
   const [stats, setStats] = useState(null);
 
   useEffect(() => {
-    getStats("test_user_123").then((s) => setStats(s));
+    const user=getUser;
+    getStats(user).then((s) => setStats(s));
   }, []);
 
   const card = {

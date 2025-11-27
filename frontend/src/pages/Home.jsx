@@ -2,7 +2,7 @@ import React from "react";
 import { motion } from "framer-motion";
 import ShortenForm from "../components/ShortenForm";
 
-export default function Home() {
+export default function Home({getUser}) {
   const headerStyle = {
     textAlign: "center",
     marginBottom: 24
@@ -21,7 +21,7 @@ export default function Home() {
         </p>
       </div>
 
-      <ShortenForm />
+      <ShortenForm getUser={getUser}/>
     </motion.div>
   );
 }

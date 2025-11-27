@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { motion } from "framer-motion";
 import { shortenURL } from "../api";
 
-export default function ShortenForm() {
+export default function ShortenForm({getUser}) {
   const [url, setUrl] = useState("");
   const [customCode, setCustomCode] = useState("");
   const [result, setResult] = useState(null);
@@ -53,9 +53,10 @@ export default function ShortenForm() {
     setLoading(true);
     setError(null);
     setResult(null);
+    const user=getUser
 
     try {
-      const res = await shortenURL(url, "test_user_123", customCode);
+      const res = await shortenURL(url, user, customCode);
       if (res.error) {
         setError(res.error);
       } else {
