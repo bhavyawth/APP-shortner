@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { getMyURLs, getQRCode } from "../api";
 
-export default function URLTable({getUser}) {
+export default function URLTable({ getUser }) {
   const [rows, setRows] = useState([]);
   const [qrImage, setQrImage] = useState(null);
   const [copiedCode, setCopiedCode] = useState(null);
@@ -12,171 +12,341 @@ export default function URLTable({getUser}) {
   }, []);
 
   async function refresh() {
-    const user=getUser
+    const user = getUser;
     const data = await getMyURLs(user);
     setRows(data || []);
   }
 
-  const tableWrap = {
-    background: "linear-gradient(180deg, rgba(255,255,255,0.01), rgba(255,255,255,0.005))",
-    borderRadius: 12,
-    padding: 10,
-    border: "1px solid rgba(255,255,255,0.04)",
-    boxShadow: "0 8px 30px rgba(0,0,0,0.6)",
-    backdropFilter: "blur(6px)"
-  };
-
-  const thStyle = { textAlign: "left", padding: "10px 12px", color: "#bfe9ff", fontSize: 13 };
-  const tdStyle = { padding: "10px 12px", borderTop: "1px solid rgba(255,255,255,0.02)" };
-
   return (
-    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} style={tableWrap}>
-      <h3 style={{ marginTop: 6, marginBottom: 8 }}>Your Links</h3>
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      style={{
+        background: "#fff5e6",
+        border: "6px solid #2d1810",
+        borderRadius: 20,
+        padding: 28,
+        boxShadow: "10px 10px 0px #2d1810",
+      }}
+    >
+      <h3
+        style={{
+          marginTop: 0,
+          marginBottom: 20,
+          fontSize: 28,
+          fontWeight: 900,
+          color: "#2d1810",
+          textTransform: "uppercase",
+        }}
+      >
+        🔗 Your Links
+      </h3>
 
-      <table style={{ width: "100%", borderCollapse: "collapse" }}>
-        <thead>
-          <tr>
-            <th style={thStyle}>Short</th>
-            <th style={thStyle}>Destination</th>
-            <th style={thStyle}>Clicks</th>
-            <th style={thStyle}>Copy</th>
-            <th style={thStyle}>QR</th>
-          </tr>
-        </thead>
-
-        <tbody>
-          <AnimatePresence>
-            {rows.length === 0 && (
-              <motion.tr
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
+      <div style={{ overflowX: "auto" }}>
+        <table style={{ width: "100%", borderCollapse: "separate", borderSpacing: "0 12px" }}>
+          <thead>
+            <tr>
+              <th
+                style={{
+                  textAlign: "left",
+                  padding: "14px 18px",
+                  color: "#fff5e6",
+                  fontSize: 14,
+                  fontWeight: 900,
+                  textTransform: "uppercase",
+                  background: "#ff6b6b",
+                  border: "4px solid #2d1810",
+                  borderRight: "none",
+                  borderRadius: "12px 0 0 12px",
+                }}
               >
-                <td colSpan="5" style={{ padding: 20, textAlign: "center", color: "#aee8ff" }}>
-                  No URLs yet — shorten one on the home page!
-                </td>
-              </motion.tr>
-            )}
-
-            {rows.map((item, i) => (
-              <motion.tr
-                key={item.code}
-                initial={{ opacity: 0, y: 6 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: 6 }}
-                transition={{ duration: 0.25, delay: i * 0.03 }}
-                style={{ color: "#dbf7ff" }}
+                Short
+              </th>
+              <th
+                style={{
+                  textAlign: "left",
+                  padding: "14px 18px",
+                  color: "#fff5e6",
+                  fontSize: 14,
+                  fontWeight: 900,
+                  textTransform: "uppercase",
+                  background: "#ff6b6b",
+                  border: "4px solid #2d1810",
+                  borderRight: "none",
+                  borderLeft: "none",
+                }}
               >
-                <td style={tdStyle}>
-                  <a href={`http://localhost:5000/${item.code}`} target="_blank" rel="noreferrer" style={{ color: "#c7f1ff" }}>
-                    {item.code}
-                  </a>
-                </td>
+                Destination
+              </th>
+              <th
+                style={{
+                  textAlign: "left",
+                  padding: "14px 18px",
+                  color: "#fff5e6",
+                  fontSize: 14,
+                  fontWeight: 900,
+                  textTransform: "uppercase",
+                  background: "#ff6b6b",
+                  border: "4px solid #2d1810",
+                  borderRight: "none",
+                  borderLeft: "none",
+                }}
+              >
+                Clicks
+              </th>
+              <th
+                style={{
+                  textAlign: "center",
+                  padding: "14px 18px",
+                  color: "#fff5e6",
+                  fontSize: 14,
+                  fontWeight: 900,
+                  textTransform: "uppercase",
+                  background: "#ff6b6b",
+                  border: "4px solid #2d1810",
+                  borderRight: "none",
+                  borderLeft: "none",
+                }}
+              >
+                Copy
+              </th>
+              <th
+                style={{
+                  textAlign: "center",
+                  padding: "14px 18px",
+                  color: "#fff5e6",
+                  fontSize: 14,
+                  fontWeight: 900,
+                  textTransform: "uppercase",
+                  background: "#ff6b6b",
+                  border: "4px solid #2d1810",
+                  borderLeft: "none",
+                  borderRadius: "0 12px 12px 0",
+                }}
+              >
+                QR
+              </th>
+            </tr>
+          </thead>
 
-                <td style={tdStyle}>
-                  <div style={{ maxWidth: 520, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+          <tbody>
+            <AnimatePresence>
+              {rows.length === 0 && (
+                <tr>
+                  <td
+                    colSpan="5"
+                    style={{
+                      padding: 32,
+                      textAlign: "center",
+                      color: "#2d1810",
+                      fontWeight: 700,
+                      fontSize: 16,
+                    }}
+                  >
+                    No URLs yet — create one above! 🚀
+                  </td>
+                </tr>
+              )}
+
+              {rows.map((item, i) => (
+                <motion.tr
+                  key={item.code}
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: 20 }}
+                  transition={{ delay: i * 0.05 }}
+                >
+                  <td
+                    style={{
+                      padding: "16px 18px",
+                      background: "white",
+                      border: "4px solid #2d1810",
+                      borderRight: "none",
+                      borderRadius: "12px 0 0 12px",
+                      fontWeight: 800,
+                    }}
+                  >
+                    <a
+                      href={`/r/${item.code}`}
+                      target="_blank"
+                      rel="noreferrer"
+                      style={{ color: "#ff6b6b", textDecoration: "none" }}
+                    >
+                      {item.code}
+                    </a>
+                  </td>
+
+                  <td
+                    style={{
+                      padding: "16px 18px",
+                      background: "white",
+                      border: "4px solid #2d1810",
+                      borderRight: "none",
+                      borderLeft: "none",
+                      maxWidth: 400,
+                      overflow: "hidden",
+                      textOverflow: "ellipsis",
+                      whiteSpace: "nowrap",
+                      fontWeight: 600,
+                      color: "#2d1810",
+                    }}
+                  >
                     {item.long_url}
-                  </div>
-                </td>
+                  </td>
 
-                <td style={tdStyle}>{item.clicks ?? 0}</td>
-
-                <td style={tdStyle}>
-                  <motion.button
-                    onClick={() => {
-                      const fullURL = `http://localhost:5000/${item.code}`;
-                      navigator.clipboard.writeText(fullURL);
-                      setCopiedCode(item.code);
-                      setTimeout(() => setCopiedCode(null), 1300);
-                    }}
-                    whileTap={{ scale: 0.98 }}
+                  <td
                     style={{
-                      padding: "6px 10px",
-                      borderRadius: 8,
-                      border: "none",
-                      cursor: "pointer",
-                      background: copiedCode === item.code ? "#10b981" : "linear-gradient(135deg, #00c6ff, #0072ff)",
-                      color: "#051523",
-                      fontWeight: 700
+                      padding: "16px 18px",
+                      background: "white",
+                      border: "4px solid #2d1810",
+                      borderRight: "none",
+                      borderLeft: "none",
+                      fontWeight: 800,
+                      color: "#2d1810",
                     }}
                   >
-                    {copiedCode === item.code ? "Copied ✓" : "Copy"}
-                  </motion.button>
-                </td>
+                    {item.clicks ?? 0}
+                  </td>
 
-                <td style={tdStyle}>
-                  <motion.button
-                    onClick={async () => {
-                      const res = await getQRCode(item.code);
-                      setQrImage("data:image/png;base64," + res.qr);
-                    }}
-                    whileTap={{ scale: 0.98 }}
+                  <td
                     style={{
-                      padding: "6px 10px",
-                      borderRadius: 8,
-                      border: "none",
-                      cursor: "pointer",
-                      background: "linear-gradient(135deg, #00c6ff, #0072ff)",
-                      color: "#051523",
-                      fontWeight: 700
+                      padding: "16px 18px",
+                      background: "white",
+                      border: "4px solid #2d1810",
+                      borderRight: "none",
+                      borderLeft: "none",
+                      textAlign: "center",
                     }}
                   >
-                    QR
-                  </motion.button>
-                </td>
-              </motion.tr>
-            ))}
-          </AnimatePresence>
-        </tbody>
-      </table>
+                    <motion.button
+                      whileHover={{ y: -2 }}
+                      whileTap={{ scale: 0.95 }}
+                      onClick={() => {
+                        const fullURL = `http://localhost:5000/${item.code}`;
+                        navigator.clipboard.writeText(fullURL);
+                        setCopiedCode(item.code);
+                        setTimeout(() => setCopiedCode(null), 1500);
+                      }}
+                      style={{
+                        padding: "8px 16px",
+                        border: "3px solid #2d1810",
+                        borderRadius: 8,
+                        background: copiedCode === item.code ? "#95e1d3" : "#ffe66d",
+                        color: "#2d1810",
+                        fontWeight: 900,
+                        fontSize: 13,
+                        cursor: "pointer",
+                        textTransform: "uppercase",
+                      }}
+                    >
+                      {copiedCode === item.code ? "✓" : "Copy"}
+                    </motion.button>
+                  </td>
 
-      {qrImage && (
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          style={{
-            position: "fixed",
-            inset: 0,
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            background: "rgba(0,0,0,0.55)",
-            zIndex: 60
-          }}
-          onClick={() => setQrImage(null)}
-        >
+                  <td
+                    style={{
+                      padding: "16px 18px",
+                      background: "white",
+                      border: "4px solid #2d1810",
+                      borderLeft: "none",
+                      borderRadius: "0 12px 12px 0",
+                      textAlign: "center",
+                    }}
+                  >
+                    <motion.button
+                      whileHover={{ y: -2 }}
+                      whileTap={{ scale: 0.95 }}
+                      onClick={async () => {
+                        const res = await getQRCode(item.code);
+                        setQrImage("data:image/png;base64," + res.qr);
+                      }}
+                      style={{
+                        padding: "8px 16px",
+                        border: "3px solid #2d1810",
+                        borderRadius: 8,
+                        background: "#4ecdc4",
+                        color: "#2d1810",
+                        fontWeight: 900,
+                        fontSize: 13,
+                        cursor: "pointer",
+                        textTransform: "uppercase",
+                      }}
+                    >
+                      QR
+                    </motion.button>
+                  </td>
+                </motion.tr>
+              ))}
+            </AnimatePresence>
+          </tbody>
+        </table>
+      </div>
+
+      {/* QR Modal */}
+      <AnimatePresence>
+        {qrImage && (
           <motion.div
-            initial={{ scale: 0.9 }}
-            animate={{ scale: 1 }}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
             style={{
-              background: "linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01))",
-              borderRadius: 12,
-              padding: 20,
-              border: "1px solid rgba(255,255,255,0.06)"
+              position: "fixed",
+              inset: 0,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              background: "rgba(45, 24, 16, 0.8)",
+              backdropFilter: "blur(8px)",
+              zIndex: 100,
             }}
-            onClick={(e) => e.stopPropagation()}
+            onClick={() => setQrImage(null)}
           >
-            <img src={qrImage} alt="qr" width={220} height={220} style={{ display: "block" }} />
-            <a
-              href={qrImage}
-              download="qrcode.png"
+            <motion.div
+              initial={{ scale: 0.8, y: 20 }}
+              animate={{ scale: 1, y: 0 }}
+              exit={{ scale: 0.8, y: 20 }}
               style={{
-                display: "inline-block",
-                marginTop: 12,
-                padding: "8px 12px",
-                borderRadius: 8,
-                background: "linear-gradient(90deg,#10b981,#34d399)",
-                color: "#021217",
-                fontWeight: 800,
-                textDecoration: "none"
+                background: "#fff5e6",
+                border: "6px solid #2d1810",
+                borderRadius: 20,
+                padding: 32,
+                boxShadow: "12px 12px 0px #2d1810",
               }}
+              onClick={(e) => e.stopPropagation()}
             >
-              Download QR
-            </a>
+              <img
+                src={qrImage}
+                alt="qr"
+                width={240}
+                height={240}
+                style={{ display: "block", border: "4px solid #2d1810", borderRadius: 12 }}
+              />
+              <motion.a
+                whileHover={{ y: -2 }}
+                whileTap={{ scale: 0.98 }}
+                href={qrImage}
+                download="qrcode.png"
+                style={{
+                  display: "block",
+                  marginTop: 20,
+                  padding: "14px 24px",
+                  textAlign: "center",
+                  borderRadius: 12,
+                  background: "#4ecdc4",
+                  color: "#2d1810",
+                  fontWeight: 900,
+                  textDecoration: "none",
+                  border: "4px solid #2d1810",
+                  boxShadow: "4px 4px 0px #2d1810",
+                  textTransform: "uppercase",
+                }}
+              >
+                📥 Download QR
+              </motion.a>
+            </motion.div>
           </motion.div>
-        </motion.div>
-      )}
+        )}
+      </AnimatePresence>
     </motion.div>
   );
 }

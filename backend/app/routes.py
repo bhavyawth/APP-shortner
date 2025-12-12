@@ -1,4 +1,4 @@
-from flask import Blueprint, request, jsonify, redirect
+from flask import Blueprint, request, jsonify, redirect,render_template
 from .services import create_short_url, resolve_url
 from app.models import URLDatabase
 from app.analytics import get_user_stats
@@ -37,28 +37,35 @@ def shorten():
 
 @url_blueprint.route("/<code>", methods=["GET", "POST"])
 def redirect_url(code):
-    data = request.json if request.method == "POST" else {}
+    data = request.form or {}
 
     password = data.get("password")
 
-    row = db.get_url_full(code)   
+    row = db.get_url_full(code)
     if not row:
-        return jsonify({"error": "URL not found"}), 404
+        return "URL not found", 404
 
     long_url, password_hash, expiry_time = row
 
+    # Expiry check
     if expiry_time:
         expiry_dt = datetime.fromisoformat(expiry_time)
         if datetime.utcnow() > expiry_dt:
-            return jsonify({"error": "URL expired"}), 410
+            return render_template("expired_page.html")
 
+
+    # Password protection
     if password_hash:
+        # If no password submitted yet → show form
         if not password:
-            return jsonify({"error": "password required"}), 401
+            return render_template("password_page.html")
 
+        # Check password
         if hashlib.sha256(password.encode()).hexdigest() != password_hash:
-            return jsonify({"error": "wrong password"}), 403
+            return render_template("password_page.html", error="Wrong password!")
 
+    # Successful access → count click and redirect
+    db.increment_click(code)
     return redirect(long_url)
 
 @url_blueprint.route("/stats", methods=["POST"])

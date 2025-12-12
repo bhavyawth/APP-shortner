@@ -22,7 +22,13 @@ def create_short_url(long_url, host, user_token, custom_code=None, password=None
 
         expiry_time = None
         if expiry_minutes:
-            expiry_time = (datetime.utcnow() + timedelta(minutes=expiry_minutes)).isoformat()
+            try:
+                expiry_minutes = int(expiry_minutes)
+                expiry_time = (datetime.utcnow() + timedelta(minutes=expiry_minutes)).isoformat()
+            except ValueError:
+                raise ValueError("expiry_minutes must be an integer")
+
+
 
         db.insert_url(code, long_url, user_token, password_hash, expiry_time)
 

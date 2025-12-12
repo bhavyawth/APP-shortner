@@ -3,163 +3,230 @@ import { BrowserRouter, Routes, Route, Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import Home from "./pages/Home";
 import Dashboard from "./pages/Dashboard";
+import RedirectHandler from "./components/RedirectHandler";
 
 export default function App() {
-const [user, setUser] = useState(() => {
-  const saved = localStorage.getItem("user");
-  return saved ? JSON.parse(saved) : null;
-});
+  const [user, setUser] = useState(() => {
+    const saved = localStorage.getItem("user");
+    return saved ? JSON.parse(saved) : null;
+  });
 
-  const [userText,setUserText]=useState("")
-  // GLOBAL inline styles
+  const [userText, setUserText] = useState("");
+
+  // Warm sunset background with soft grain texture
   const appStyle = {
     minHeight: "100vh",
-    background: "linear-gradient(135deg, #0f172a 0%, #071124 50%, #00121a 100%)",
-    color: "#e6eef8",
-    fontFamily: "'Inter', system-ui, -apple-system, Segoe UI, Roboto, 'Helvetica Neue', Arial",
-    padding: "0px 4px"
+    background: "linear-gradient(135deg, #fff5e6 0%, #ffe4cc 30%, #ffd4b3 60%, #ffb88c 100%)",
+    color: "#2d1810",
+    fontFamily: "'Space Grotesk', 'Inter', system-ui, sans-serif",
+    padding: "20px",
+    position: "relative",
   };
 
   const navStyle = {
     display: "flex",
     justifyContent: "space-between",
     alignItems: "center",
-    maxWidth: 1100,
-    margin: "0 auto 30px",
-    gap: 12
+    maxWidth: 1200,
+    margin: "0 auto 40px",
+    padding: "20px 28px",
+    background: "#ff6b6b",
+    border: "5px solid #2d1810",
+    borderRadius: 16,
+    boxShadow: "8px 8px 0px #2d1810",
   };
 
   const logoStyle = {
-    fontWeight: 800,
-    letterSpacing: 1,
+    fontWeight: 900,
+    fontSize: 28,
+    letterSpacing: -1,
+    color: "#fff5e6",
+    textDecoration: "none",
     display: "flex",
-    gap: 10,
     alignItems: "center",
-    color: "white",
-    textDecoration: "none"
-  };
-
-  const neonBadge = {
-    width: 10,
-    height: 10,
-    borderRadius: 999,
-    background: "radial-gradient(circle at 30% 30%, #34d399, #0ea5e9)",
-    boxShadow: "0 0 12px rgba(14,165,233,0.6), 0 0 30px rgba(52,211,153,0.12)"
+    gap: 12,
+    textShadow: "3px 3px 0px #2d1810",
   };
 
   const linkStyle = {
-    color: "#c7e8ff",
+    color: "#2d1810",
     textDecoration: "none",
-    padding: "8px 12px",
-    borderRadius: 8,
-    border: "1px solid rgba(0, 198, 255, 1)",
-    backdropFilter: "blur(4px)",
+    padding: "12px 24px",
+    borderRadius: 12,
+    border: "4px solid #2d1810",
+    background: "#ffe66d",
+    fontWeight: 800,
+    fontSize: 16,
+    boxShadow: "4px 4px 0px #2d1810",
+    transition: "all 0.2s cubic-bezier(0.4, 0, 0.2, 1)",
   };
 
-
-  const getUser=()=>{
+  const getUser = () => {
     return user;
-  }
+  };
+
   return (
     <div style={appStyle}>
-      {!user && (
-  <div className="fixed inset-0 z-[999] flex items-center justify-center">
-
-    {/* BACKDROP */}
-    <div className="absolute inset-0 bg-[rgba(255,255,255,0.04)]  backdrop-blur-xl" />
-
-    {/* CARD */}
-    <div
-      className="
-        relative z-[1000]
-        w-[350px]
-        p-8
-        rounded-3xl
-        bg-white/10
-        shadow-[0_0_25px_rgba(0,150,255,0.35)]
-        border border-blue-300/40
-        backdrop-blur-2xl
-        flex flex-col items-center gap-6
-        animate-[fadeInScale_0.5s_ease-out]
-      "
-    >
-
-      {/* TITLE */}
-      <h2 className="text-2xl font-bold text-blue-200 tracking-wide drop-shadow-lg">
-        Enter Your Details
-      </h2>
-
-      {/* INPUT */}
-      <input
-      value={userText}
-        onChange={(e)=>{setUserText(e.target.value)}}
-        className="
-          w-full
-          p-3
-          rounded-xl
-          bg-white/20
-          text-blue-100
-          placeholder-blue-200/60
-          border border-blue-400/50
-          shadow-inner
-          focus:outline-none
-          focus:ring-2 focus:ring-emerald-400/70
-          backdrop-blur-lg
-        "
-        type="text"
-        placeholder="Your username…"
+      {/* Floating decorative shapes */}
+      <div
+        style={{
+          position: "fixed",
+          top: "10%",
+          left: "5%",
+          width: 120,
+          height: 120,
+          background: "#4ecdc4",
+          border: "5px solid #2d1810",
+          borderRadius: "50%",
+          opacity: 0.3,
+          zIndex: 0,
+        }}
+      />
+      <div
+        style={{
+          position: "fixed",
+          bottom: "15%",
+          right: "8%",
+          width: 160,
+          height: 160,
+          background: "#ff6b6b",
+          border: "5px solid #2d1810",
+          transform: "rotate(45deg)",
+          opacity: 0.25,
+          zIndex: 0,
+        }}
       />
 
-      {/* BUTTON */}
-      <button
-        className="
-          w-full
-          py-3
-          rounded-xl
-          bg-emerald-400/90
-          text-slate-900
-          font-semibold
-          shadow-[0_0_15px_rgba(52,211,153,0.55)]
-          hover:bg-emerald-300
-          hover:shadow-[0_0_25px_rgba(52,211,153,0.8)]
-          transition-all duration-200
-        "
-          onClick={()=>{setUser(userText);localStorage.setItem("user",JSON.stringify(userText))}}
-      >
-        Submit
-      </button>
-    </div>
-  </div>
-)}
+      {!user && (
+        <div
+          style={{
+            position: "fixed",
+            inset: 0,
+            zIndex: 999,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            background: "rgba(255, 245, 230, 0.95)",
+            backdropFilter: "blur(8px)",
+          }}
+        >
+          <motion.div
+            initial={{ scale: 0.8, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            transition={{ type: "spring", stiffness: 200, damping: 20 }}
+            style={{
+              width: 400,
+              padding: 40,
+              background: "#4ecdc4",
+              border: "6px solid #2d1810",
+              borderRadius: 20,
+              boxShadow: "12px 12px 0px #2d1810",
+            }}
+          >
+            <h2
+              style={{
+                fontSize: 32,
+                fontWeight: 900,
+                color: "#fff5e6",
+                textAlign: "center",
+                marginBottom: 24,
+                textShadow: "4px 4px 0px #2d1810",
+              }}
+            >
+              Welcome! 🌅
+            </h2>
 
+            <input
+              value={userText}
+              onChange={(e) => setUserText(e.target.value)}
+              style={{
+                width: "100%",
+                padding: "16px 20px",
+                fontSize: 18,
+                fontWeight: 700,
+                background: "#fff5e6",
+                border: "4px solid #2d1810",
+                borderRadius: 12,
+                color: "#2d1810",
+                outline: "none",
+                marginBottom: 20,
+              }}
+              type="text"
+              placeholder="Enter username..."
+            />
+
+            <motion.button
+              whileHover={{ y: -2, boxShadow: "6px 6px 0px #2d1810" }}
+              whileTap={{ y: 0, boxShadow: "2px 2px 0px #2d1810" }}
+              style={{
+                width: "100%",
+                padding: "16px",
+                fontSize: 20,
+                fontWeight: 900,
+                background: "#ffe66d",
+                border: "4px solid #2d1810",
+                borderRadius: 12,
+                color: "#2d1810",
+                cursor: "pointer",
+                boxShadow: "4px 4px 0px #2d1810",
+                transition: "all 0.2s",
+              }}
+              onClick={() => {
+                setUser(userText);
+                localStorage.setItem("user", JSON.stringify(userText));
+              }}
+            >
+              Let's Go! 🚀
+            </motion.button>
+          </motion.div>
+        </div>
+      )}
 
       <BrowserRouter>
-        <nav style={navStyle}>
-          <motion.a
-            href="/"
-            style={logoStyle}
-            initial={{ y: -10, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            transition={{ type: "spring", stiffness: 120, damping: 12 }}
-          >
-            <span style={neonBadge} />
-            <span style={{ fontSize: 20 }}>NeonShort</span>
-          </motion.a>
+        <motion.nav
+          initial={{ y: -20, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ type: "spring", stiffness: 120 }}
+          style={navStyle}
+        >
+          <a href="/" style={logoStyle}>
+            <span
+              style={{
+                width: 16,
+                height: 16,
+                background: "#ffe66d",
+                border: "3px solid #2d1810",
+                borderRadius: "50%",
+                display: "inline-block",
+              }}
+            />
+            ShortCut
+          </a>
 
-          <div style={{ display: "flex", gap: 8,marginTop:"15px" }}>
-            <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
-              <Link to="/" style={linkStyle}>Home</Link>
+          <div style={{ display: "flex", gap: 12 }}>
+            <motion.div
+              whileHover={{ y: -2, boxShadow: "6px 6px 0px #2d1810" }}
+              whileTap={{ y: 0, boxShadow: "2px 2px 0px #2d1810" }}
+            >
+              <Link to="/" style={linkStyle}>
+                Home
+              </Link>
             </motion.div>
-            <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
-              <Link to="/dashboard" style={linkStyle}>Dashboard</Link>
+            <motion.div
+              whileHover={{ y: -2, boxShadow: "6px 6px 0px #2d1810" }}
+              whileTap={{ y: 0, boxShadow: "2px 2px 0px #2d1810" }}
+            >
+              <Link to="/dashboard" style={linkStyle}>
+                Dashboard
+              </Link>
             </motion.div>
           </div>
-        </nav>
+        </motion.nav>
 
-        <main style={{ maxWidth: 1100, margin: "0 auto" }}>
+        <main style={{ maxWidth: 1200, margin: "0 auto", position: "relative", zIndex: 1 }}>
           <Routes>
-            <Route path="/" element={<Home  getUser={getUser()}/>} />
-            <Route path="/dashboard" element={<Dashboard  getUser={getUser()}/>} />
+            <Route path="/" element={<Home getUser={getUser()} />} />
+            <Route path="/dashboard" element={<Dashboard getUser={getUser()} />} />
           </Routes>
         </main>
       </BrowserRouter>

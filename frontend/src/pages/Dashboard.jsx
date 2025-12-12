@@ -1,21 +1,21 @@
+// Dashboard.jsx (same as before, just styling will update via components)
 import React from "react";
 import { motion } from "framer-motion";
 import StatsCard from "../components/StatsCard";
 import URLTable from "../components/URLTable";
 
-export default function Dashboard({getUser}) {
+export default function Dashboard({ getUser }) {
   return (
     <motion.div
-      initial={{ opacity: 0, y: 8 }}
+      initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.45 }}
+      transition={{ duration: 0.5 }}
     >
-      <div style={{ display: "flex", gap: 20, alignItems: "flex-start", marginBottom: 20 }}>
-        <StatsCard getUser={getUser}/>
-        <div style={{ flex: 1 }} />
+      <div style={{ marginBottom: 32 }}>
+        <StatsCard getUser={getUser} />
       </div>
 
-      <URLTable getUser={getUser}/>
+      <URLTable getUser={getUser} />
     </motion.div>
   );
 }

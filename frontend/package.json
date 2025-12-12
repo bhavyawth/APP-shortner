@@ -11,9 +11,12 @@
   },
   "dependencies": {
     "@tailwindcss/vite": "^4.1.17",
-    "framer-motion": "^12.23.24",
+    "canvas-confetti": "^1.9.4",
+    "framer-motion": "^12.23.26",
     "react": "^19.2.0",
+    "react-confetti": "^6.4.0",
     "react-dom": "^19.2.0",
+    "react-parallax-tilt": "^1.7.315",
     "react-router": "^7.9.6",
     "react-router-dom": "^7.9.6"
   },
