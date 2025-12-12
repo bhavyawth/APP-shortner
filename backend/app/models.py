@@ -17,21 +17,24 @@ class URLDatabase:
                 code TEXT UNIQUE,
                 long_url TEXT,
                 user_token TEXT,
-                clicks INTEGER DEFAULT 0
+                clicks INTEGER DEFAULT 0,
+                password_hash TEXT DEFAULT NULL,
+                expiry_time TEXT DEFAULT NULL
             )
         """)
         conn.commit()
         conn.close()
 
-    def insert_url(self, code, long_url, user_token):
+    def insert_url(self, code, long_url, user_token, password_hash=None, expiry_time=None):
         conn = self.connect()
         cur = conn.cursor()
         cur.execute(
-            "INSERT INTO urls (code, long_url, user_token) VALUES (?, ?, ?)",
-            (code, long_url, user_token)
+            "INSERT INTO urls (code, long_url, user_token, password_hash, expiry_time) VALUES (?, ?, ?, ?, ?)",
+            (code, long_url, user_token, password_hash, expiry_time)
         )
         conn.commit()
         conn.close()
+
 
     def get_url(self, code):
         conn = self.connect()
@@ -48,6 +51,15 @@ class URLDatabase:
         rows = cur.fetchall()
         conn.close()
         return rows
+    
+    def get_url_full(self, code):
+        conn = self.connect()
+        cur = conn.cursor()
+        cur.execute("SELECT long_url, password_hash, expiry_time FROM urls WHERE code=?", (code,))
+        result = cur.fetchone()
+        conn.close()
+        return result  # return tuple or None
+
 
     def increment_click(self, code):
         conn = self.connect()

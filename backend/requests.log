@@ -63,3 +63,6 @@ Redirect request for code: fFcPiS
 Error creating short URL: no such table: urls
 Error creating short URL: no such table: urls
 Error creating short URL: no such table: urls
+Redirect request for code: app
+Error creating short URL: table urls has no column named password_hash
+Error creating short URL: table urls has no column named password_hash

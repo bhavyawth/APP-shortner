@@ -5,12 +5,13 @@ from app.analytics import get_user_stats
 import qrcode
 import base64
 from io import BytesIO
+from datetime import datetime
+import hashlib
 
 db = URLDatabase()
 
 url_blueprint = Blueprint("url_shortener", __name__)
 
-# Create URL
 @url_blueprint.route("/shorten", methods=["POST"])
 def shorten():
     data = request.json
@@ -18,21 +19,48 @@ def shorten():
     user_token = data.get("user_token")
     custom_code = data.get("custom_code")
 
+    password = data.get("password")                
+    expiry_minutes = data.get("expiry_minutes")    
+
     if not long_url or not user_token:
         return jsonify({"error": "url and user_token required"}), 400
 
-    result = create_short_url(long_url, request.host_url, user_token, custom_code)
+    result = create_short_url(
+        long_url,
+        request.host_url,
+        user_token,
+        custom_code,
+        password=password,
+        expiry_minutes=expiry_minutes
+    )
     return jsonify(result)
 
-# Redirect to long URL
-@url_blueprint.route("/<code>")
+@url_blueprint.route("/<code>", methods=["GET", "POST"])
 def redirect_url(code):
-    url = resolve_url(code)
-    if url:
-        return redirect(url)
-    return jsonify({"error": "URL not found"}), 404
+    data = request.json if request.method == "POST" else {}
 
-# User stats
+    password = data.get("password")
+
+    row = db.get_url_full(code)   
+    if not row:
+        return jsonify({"error": "URL not found"}), 404
+
+    long_url, password_hash, expiry_time = row
+
+    if expiry_time:
+        expiry_dt = datetime.fromisoformat(expiry_time)
+        if datetime.utcnow() > expiry_dt:
+            return jsonify({"error": "URL expired"}), 410
+
+    if password_hash:
+        if not password:
+            return jsonify({"error": "password required"}), 401
+
+        if hashlib.sha256(password.encode()).hexdigest() != password_hash:
+            return jsonify({"error": "wrong password"}), 403
+
+    return redirect(long_url)
+
 @url_blueprint.route("/stats", methods=["POST"])
 def stats():
     data = request.json
@@ -43,7 +71,6 @@ def stats():
 
     return jsonify(get_user_stats(user_token))
 
-# Get all URLs for a user
 @url_blueprint.route("/my-urls", methods=["POST"])
 def my_urls():
     data = request.json
@@ -59,6 +86,7 @@ def my_urls():
         }
         for r in rows
     ])
+
 @url_blueprint.route("/qr", methods=["POST"])
 def generate_qr():
     data = request.json
@@ -69,7 +97,6 @@ def generate_qr():
 
     url = f"{request.host_url}{code}"
 
-    # Generate QR
     qr = qrcode.make(url)
     buffer = BytesIO()
     qr.save(buffer, format="PNG")
